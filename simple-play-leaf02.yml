@@ -1,0 +1,78 @@
+---
+- name: EVPN deploy
+  hosts: leaf02
+  vars:
+          loopback_ip: "10.0.0.4"
+          hostname_sw: "leaf02"
+          vrf_customer: "bbcore"
+          l3vni_vlan: "4001"
+          l3vni_name: "vnil3-bbcore"
+          l3vxlan_id: "104001"
+          asn: "65002"
+
+  remote_user: cumulus
+  tasks:
+    - name: Adding hostname
+      nclu:
+        commands:
+            - add hostname {{ hostname_sw }}
+    - name: configure leaf01 interfaces uplink to spine
+      nclu:
+        commands: 
+            - add interface swp1 alias UPLINK_TO_SPINE01
+            - add interface swp2 alias UPLINK_TO_SPINE02
+        commit: true
+    - name: configure leaf01 loopback address
+      nclu:
+        commands: 
+            - add loopback lo ip address {{ loopback_ip }}/32
+        commit: true
+    - name: Set MTU for interfaces UPLINK_TO_SPINE
+      nclu:
+        commands:
+            - add interface swp1-2 mtu 9216
+    - name: Set IPv6 configuration on UPLINK_TO_SPINE
+      nclu:
+        commands:
+            - add interface swp1-2 ipv6 nd suppress-ra
+            - add interface swp1-2 ipv6 nd ra-interval 5
+    - name: Adding Layer 3 VNI VLAN
+      nclu:
+        commands:
+            - add vrf {{ vrf_customer }} vrf-table auto
+            - add vlan {{ l3vni_vlan }} vlan-id {{ l3vni_vlan }}
+            - add bridge bridge vids {{ l3vni_vlan }}
+          
+        commit: true
+    - name: Adding Layer 3 VNI VxlAN
+      nclu:
+        commands:
+            - add vxlan {{ l3vni_name }} vxlan id {{ l3vxlan_id }}
+            - add vxlan {{ l3vni_name }} vxlan local-tunnelip {{ loopback_ip }}
+            - add vxlan {{ l3vni_name }} bridge access {{ l3vni_vlan }}
+            - add vxlan {{ l3vni_name }} mtu 9216
+    - name: Adding Layer 3 VNI to VRF
+      nclu:
+        commands:
+            - add vlan {{ l3vni_vlan }} vrf {{ vrf_customer }}
+            - add vrf {{ vrf_customer }} vni {{ l3vxlan_id }}
+        commit: true
+    - name: BGP Basic
+      nclu:
+        commands:
+           - add bgp autonomous-system {{ asn }}
+           - add bgp router-id {{ loopback_ip }}
+           - add bgp bestpath as-path multipath-relax
+           - add bgp neighbor SPINES peer-group
+           - add bgp neighbor SPINES remote-as external
+           - add bgp neighbor SPINES capability extended-nexthop
+           - add bgp neighbor swp1 interface peer-group SPINES
+           - add bgp neighbor swp2 interface peer-group SPINES
+           - add bgp ipv4 unicast network {{ loopback_ip }}/32
+        commit: true
+    - name: BGP EVPN
+      nclu:
+        commands:
+           - add bgp l2vpn evpn neighbor SPINES activate
+           - add bgp l2vpn evpn advertise-all-vni
+        commit: true
