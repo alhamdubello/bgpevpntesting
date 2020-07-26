@@ -1,0 +1,10 @@
+---
+- name: EVPN deploying spine
+  hosts: spine
+  vars:
+    bgpevpn:
+      - { loopback_ip: 10.0.0.1, hostname_sw: spine01, asn: 65003 }
+      - { loopback_ip: 10.0.0.2, hostname_sw: spine02, asn: 65003 }
+  remote_user: cumulus
+  roles:
+  - spinerole
