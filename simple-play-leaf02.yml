@@ -9,7 +9,12 @@
           l3vni_name: "vnil3-bbcore"
           l3vxlan_id: "104001"
           asn: "65002"
-
+          vlan: [ 201, 202, 301, 302 ]
+          vxlan: 
+            - { name: vni201, id: 10201, vid: 201, gw: 172.16.201.1/24 }
+            - { name: vni202, id: 10202, vid: 202, gw: 172.16.202.1/24 }
+            - { name: vni301, id: 10301, vid: 301, gw: 172.16.103.1/24 }
+            - { name: vni302, id: 10302, vid: 302, gw: 172.16.102.1/24 }
   remote_user: cumulus
   tasks:
     - name: Adding hostname
@@ -57,6 +62,42 @@
             - add vlan {{ l3vni_vlan }} vrf {{ vrf_customer }}
             - add vrf {{ vrf_customer }} vni {{ l3vxlan_id }}
         commit: true
+    - name: Adding Host VLAN's
+      nclu:
+        commands:
+           - add vlan {{ item }} vlan-id {{ item }}
+           - add bridge bridge vids {{ item }}
+        commit: true
+      with_items: 
+        - "{{ vlan }}"
+    - name: Adding Host VNI names,id and vrf
+      nclu:
+        commands:
+           - add vxlan {{ item.name }} vxlan id {{ item.id }}
+           - add vxlan {{ item.name }} vxlan local-tunnelip {{ loopback_ip }}
+           - add vxlan {{ item.name }} bridge access {{ item.vid }}
+           - add vlan {{ item.vid }} vrf {{ vrf_customer }}  
+        commit: true
+      with_items:
+        - "{{ vxlan }}"
+    - name: Adding SVI and Anycast IP for Hosts
+      nclu:
+        commands:
+           - add vlan {{ item.vid }} ip address-virtual 0a:67:0c:00:20:01 {{ item.gw }}
+        commit: true
+      with_items:
+           - "{{ vxlan }}"
+    - name: STP Optimization for VxLAN
+      nclu:
+        commands:
+           - add vxlan {{ item.name }} mtu 9216
+           - add vxlan {{ item.name }} bridge arp-nd-suppress on
+           - add vxlan {{ item.name }} bridge learning off
+           - add vxlan {{ item.name }} stp portbpdufilter
+           - add vxlan {{ item.name }} stp bpduguard
+        commit: true
+      with_items:
+        - "{{ vxlan }}"
     - name: BGP Basic
       nclu:
         commands:
