@@ -1,24 +1,16 @@
 ---
-    - name: Adding hostname
+    - name: Adding system hostname and loopback ip.
       nclu:
         commands:
-            - add hostname {{ item.hostname_sw }}
+            - add hostname "{{ hostname_sw }}"
+            - add loopback lo ip address "{{ loopback_ip }}"/32
         commit: true
-      with_items:
-        - "{{ bgpevpn }}"
-    - name: configure leaf01 interfaces uplink to spine
+    - name: Configure interfaces uplink to spine
       nclu:
         commands: 
             - add interface swp1 alias UPLINK_TO_SPINE01
             - add interface swp2 alias UPLINK_TO_SPINE02
         commit: true
-    - name: configure {{ item.hostname_sw }}loopback address
-      nclu:
-        commands: 
-            - add loopback lo ip address {{ item.loopback_ip }}/32
-        commit: true
-      with_items:
-        - "{{ bgpevpn }}"
     - name: Set MTU for interfaces UPLINK_TO_SPINE
       nclu:
         commands:
@@ -40,12 +32,10 @@
       nclu:
         commands:
             - add vxlan {{ l3vni_name }} vxlan id {{ l3vxlan_id }}
-            - add vxlan {{ l3vni_name }} vxlan local-tunnelip {{ item.loopback_ip }}
+            - add vxlan {{ l3vni_name }} vxlan local-tunnelip {{ loopback_ip }}
             - add vxlan {{ l3vni_name }} bridge access {{ l3vni_vlan }}
             - add vxlan {{ l3vni_name }} mtu 9216
         commit: true
-      with_items:
-        - "{{ bgpevpn }}"
 
     - name: Adding Layer 3 VNI to VRF
       nclu:
@@ -59,26 +49,26 @@
            - add vlan {{ item }} vlan-id {{ item }}
            - add bridge bridge vids {{ item }}
         commit: true
-      with_items: 
+      with_items:
         - "{{ vlan }}"
-
     - name: Adding Host VNI names id and vrf
       nclu:
         commands:
            - add vxlan {{ item.name }} vxlan id {{ item.id }}
-           - add vxlan {{ item.name }} vxlan local-tunnelip {{ item.loopback_ip }}
+           - add vxlan {{ item.name }} vxlan local-tunnelip {{ loopback_ip }}
            - add vxlan {{ item.name }} bridge access {{ item.vid }}
            - add vlan {{ item.vid }} vrf {{ vrf_customer }}  
-      loop:
+        commit: true
+      with_items:
         - "{{ vxlan }}"
-        - "{{ bgpevpn }}"
+
     - name: Adding SVI and Anycast IP for Hosts
       nclu:
         commands:
            - add vlan {{ item.vid }} ip address-virtual 0a:67:0c:00:20:01 {{ item.gw }}
         commit: true
       with_items:
-           - "{{ vxlan }}"
+        - "{{ vxlan }}"
     - name: STP Optimization for VxLAN
       nclu:
         commands:
@@ -92,19 +82,19 @@
         - "{{ vxlan }}"
     - name: BGP Basic
       nclu:
-        commands:
-           - add bgp autonomous-system {{ item.asn }}
-           - add bgp router-id {{ item.loopback_ip }}
-           - add bgp bestpath as-path multipath-relax
-           - add bgp neighbor SPINES peer-group
-           - add bgp neighbor SPINES remote-as external
-           - add bgp neighbor SPINES capability extended-nexthop
-           - add bgp neighbor swp1 interface peer-group SPINES
-           - add bgp neighbor swp2 interface peer-group SPINES
-           - add bgp ipv4 unicast network {{ item.loopback_ip }}/32
-        commit: true
-      with_items:
-        - "{{ bgpevpn }}"
+        atomic: true
+        template: |
+             add bgp autonomous-system {{ asn }}
+             add bgp router-id {{ loopback_ip }}
+             add bgp bestpath as-path multipath-relax
+             add bgp maximum-paths 64
+             add bgp neighbor SPINES peer-group
+             add bgp neighbor SPINES remote-as external
+             add bgp neighbor SPINES capability extended-nexthop
+             {% for nei in neighbors %}
+             add bgp neighbor {{ nei }} interface peer-group SPINES
+             {% endfor %}
+             add bgp ipv4 unicast network {{ loopback_ip }}/32
     - name: BGP EVPN
       nclu:
         commands:

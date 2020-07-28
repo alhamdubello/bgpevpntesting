@@ -1,8 +1,14 @@
+[all:vars]
+ansible_user=cumulus
+ansible_ssh_pass=password
+
 [spine]
 spine01
 spine02
+
 [leaf]
 leaf01
 leaf02
+
 [exit]
 exit01

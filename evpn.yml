@@ -1,0 +1,12 @@
+---
+- name: Deploying spine EVPN
+  hosts: spine
+  remote_user: cumulus
+  roles:
+  - spinerole
+
+- name: Deploying Leaf EVPN
+  hosts: leaf
+  remote_user: cumulus
+  roles:
+  - leafrole
