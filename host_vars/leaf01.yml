@@ -1,7 +1,7 @@
 ---
 # vars file for leaf01
     hostname_sw: leaf01
-    loopback_ip: 10.0.0.1
+    loopback_ip: 10.0.0.3
     asn: 65001
     neighbors:
       - swp1
