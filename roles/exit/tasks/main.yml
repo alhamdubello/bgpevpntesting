@@ -1,0 +1,46 @@
+---
+# tasks file for exit role
+- name: Adding System Hostname and loopback ip.
+  nclu:
+    commands:
+       - add hostname "{{ hostname_sw }}"
+       - add loopback lo ip address "{{ loopback_ip }}"/32
+    commit: true
+- name: configure interfaces LINK_TO_SPINE_SWITCHES
+  nclu:
+    commands:
+       - add interface swp1-2 alias LINK_TO_SPINE_SWITCHES
+       - add interface swp1-2
+    commit: true
+- name: Set MTU for interfaces LINK_TO_SPINE_SWITCHES
+  nclu:
+    commands:
+       - add interface swp1-2 mtu 9216
+- name: Set IPv6 configuration on LINK_TO_SPINE_SWITCHES
+  nclu:
+    commands:
+       - add interface swp1-2 ipv6 nd suppress-ra
+       - add interface swp1-2 ipv6 nd ra-interval 5
+    commit: true
+
+- name: BGP Basic
+  nclu:
+    atomic: true
+    template: |
+          add bgp autonomous-system "{{ asn }}"
+          add bgp router-id "{{ loopback_ip }}"
+          add bgp bestpath as-path multipath-relax
+          add bgp maximum-paths 64
+          add bgp neighbor SPINE peer-group
+          add bgp neighbor SPINE remote-as external
+          add bgp neighbor SPINE capability extended-nexthop
+          {% for nei in  neighbors  %}
+          add bgp neighbor "{{ nei }}" interface peer-group SPINE
+          {% endfor %}
+          add bgp ipv4 unicast network "{{ loopback_ip }}"/32
+- name: BGP EVPN
+  nclu:
+    commands:
+           - add bgp l2vpn evpn neighbor SPINE activate
+           - add bgp l2vpn evpn advertise-all-vni
+    commit: true
