@@ -1,0 +1,33 @@
+---
+# tasks file for common
+- name: Configure SNMP Settings
+  nclu:
+    commands:
+      - add snmp-server listening-address all
+      - add snmp-server readonly-community bearsnmp access any
+      - add snmp-server trap-destination 10.20.0.50 community-password bearsnmp version 2c
+    commit: true
+
+- name: Removing default ntp servers setting
+  nclu:
+     commands:
+       - del time ntp server {{ item }}
+     commit: true
+  with_items:
+    - "{{ defaultntp }}"
+
+- name: Configuring ntp servers
+  nclu:
+    commands:
+      - add time ntp server {{ item }} iburst
+    commit: true
+  with_items:
+    - "{{ ntpservers }}"
+
+- name: configuring syslog servers
+  nclu:
+    commands:
+        - add syslog host ipv4 {{ item }} port udp 514
+    commit: true
+  with_items:
+    - "{{ syslogservers }}"
