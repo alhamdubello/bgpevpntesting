@@ -4,7 +4,7 @@
   nclu:
     commands:
       - add snmp-server listening-address all
-      - add snmp-server readonly-community bearsnmp access any
+      - add snmp-server readonly-community "{{ vault_snmppass }}" access any
       - add snmp-server trap-destination 10.20.0.50 community-password bearsnmp version 2c
     commit: true
 

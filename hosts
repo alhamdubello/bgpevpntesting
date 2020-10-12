@@ -1,15 +1,14 @@
 [all:vars]
 ansible_user=cumulus
-ansible_ssh_pass=password
-
+ansible_ssh_password=password
 [spine]
-spine01
-spine02
+spine1
+spine2
 
 [leaf]
-leaf01
-leaf02
-leaf03
+leaf1
+leaf2
 
 [exit]
-exit01
+exit1
+exit2

@@ -1,9 +1,0 @@
----
-system:
-  ntp_servers:
-    - 10.10.10.1
-    - 10.10.10.2
-  syslog_servers: 10.10.10.1
-  dns_servers:
-    - 10.10.10.1
-    - 10.10.10.2
