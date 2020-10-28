@@ -1,7 +1,7 @@
 ---
 # vars file for spinerole
-    hostname_sw: spine01
-    loopback_ip: 10.0.0.1
+    hostname_sw: spine1
+    loopback_ip: 150.1.1.1
     asn: 65003
     neighbors:
       - swp1

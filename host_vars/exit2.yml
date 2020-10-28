@@ -1,0 +1,8 @@
+---
+# vars file for exit switch02
+    hostname_sw: exit2
+    loopback_ip: 150.1.7.7
+    asn: 65104
+    neighbors:
+      - swp1
+      - swp2

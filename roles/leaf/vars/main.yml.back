@@ -166,3 +166,67 @@ vxlan:
     id: 11059
     vid: 1059
     gw: 192.168.151.1/24
+  - name: VLAN1501
+    id: 11501
+    vid: 1501
+    gw: 147.188.172.4/25
+  - name: rdnhscn1722
+    id: 11502
+    vid: 1502
+    gw: 147.188.172.139/25
+  - name: rdnhscn17231
+    id: 11503
+    vid: 1503
+    gw: 172.31.0.9/22
+  - name: rdnhscn17231
+    id: 11504
+    vid: 1504
+    gw: 172.31.4.9/22
+  - name: rdnhscn17231
+    id: 11505
+    vid: 1505
+    gw: 172.31.8.9/22
+  - name: vni-RNET_1
+    id: 12001
+    vid: 2001
+    gw: 10.192.1.4/24
+  - name: vni-RNET_2
+    id: 12002
+    vid: 2002
+    gw: 10.192.2.4/24
+  - name: vni-RNET_3
+    id: 12003
+    vid: 2003
+    gw: 10.192.3.4/24
+  - name: vni-RNET_4
+    id: 12004
+    vid: 2004
+    gw: 10.192.4.4/24
+  - name: vni-RNET_5
+    id: 12005
+    vid: 2005
+    gw: 10.192.5.4/24
+  - name: vni-RNET_6
+    id: 12006
+    vid: 2006
+    gw: 10.192.6.4/24
+  - name: vni-rdn-peri
+    id: 13001
+    vid: 3001
+    gw: 10.30.0.77/22
+  - name: vni-bb2-xcat
+    id: 14001
+    vid: 4001
+    gw: 10.0.0.77/22
+  - name: vni-bb2-peri
+    id: 14003
+    vid: 4003
+    gw: 10.0.8.35/24
+  - name: vni-xcat2
+    id: 14011
+    vid: 4011
+    gw: 10.0.16.77/22
+  - name: vni-xcat3
+    id: 14013
+    vid: 4013
+    gw: 10.0.24.77/22

@@ -1,5 +1,7 @@
 ---
 # vars file for common
+#
+snmppass: snmp123
 defaultntp:
   - 0.cumulusnetworks.pool.ntp.org
   - 1.cumulusnetworks.pool.ntp.org

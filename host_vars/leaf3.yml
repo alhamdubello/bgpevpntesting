@@ -1,0 +1,14 @@
+---
+# vars file for leaf3
+hostname_sw: leaf3
+loopback_ip: 150.1.5.5
+asn: 65102
+neighbors:
+  - swp1
+  - swp2
+p2pnet: 169.254.1.0/24
+vdx_evpn:
+  - l2: swp5
+    l3: swp6
+    ipaddrm: 169.254.1.1/24
+    vlnid: 99

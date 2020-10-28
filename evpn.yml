@@ -2,8 +2,8 @@
 - name: Deploying spine switches for EVPN fabric
   hosts: spine
   roles:
-  - common
-  - spine
+   - common
+   - spine
 
 - name: Deploying leaf switches for EVPN fabric
   hosts: leaf
@@ -11,8 +11,8 @@
   - common
   - leaf
 
-- name: Deploying exit/border switches for EVPN fabric
-  hosts: exit
-  roles:
-  - common
-  - exit
+    #- name: Deploying exit/border switches for EVPN fabric
+#  hosts: exit
+    #roles:
+#  - common
+# - exit

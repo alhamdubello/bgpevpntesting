@@ -1,0 +1,8 @@
+---
+# vars file for leaf4
+    hostname_sw: leaf4
+    loopback_ip: 150.1.6.6
+    asn: 65102
+    neighbors:
+      - swp1
+      - swp2

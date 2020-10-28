@@ -24,6 +24,7 @@
     commit: true
 
 - name: BGP Basic
+  ignore_errors: yes
   nclu:
     atomic: true
     template: |

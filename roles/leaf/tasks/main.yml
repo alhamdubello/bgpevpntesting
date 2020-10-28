@@ -2,24 +2,26 @@
     - name: Adding system hostname and loopback ip.
       nclu:
         commands:
-            - add hostname "{{ hostname_sw }}"
-            - add loopback lo ip address "{{ loopback_ip }}"/32
-        commit: true
+          - add hostname "{{ hostname_sw }}"
+          - add loopback lo ip address "{{ loopback_ip }}"/32
+        atomic: true
     - name: Configure interfaces uplink to spine
       nclu:
         commands: 
-            - add interface swp1 alias UPLINK_TO_SPINE01
-            - add interface swp2 alias UPLINK_TO_SPINE02
+          - add interface swp1 alias UPLINK_TO_SPINE01
+          - add interface swp2 alias UPLINK_TO_SPINE02
         commit: true
     - name: Set MTU for interfaces UPLINK_TO_SPINE
       nclu:
         commands:
-            - add interface swp1-2 mtu 9216
+          - add interface swp1-2 mtu 9216
+        commit: true
     - name: Set IPv6 configuration on UPLINK_TO_SPINE
       nclu:
         commands:
             - add interface swp1-2 ipv6 nd suppress-ra
             - add interface swp1-2 ipv6 nd ra-interval 5
+        commit: true
     - name: Adding Layer 3 VNI VLAN
       nclu:
         commands:
@@ -46,8 +48,8 @@
     - name: Adding Host VLAN's
       nclu:
         commands:
-           - add vlan {{ item }} vlan-id {{ item }}
-           - add bridge bridge vids {{ item }}
+             - add vlan {{ item.id }} alias {{ item.name }}
+             - add bridge bridge vids {{ item.id }}
         commit: true
       with_items:
         - "{{ vlan }}"
@@ -98,6 +100,61 @@
     - name: BGP EVPN
       nclu:
         commands:
-           - add bgp l2vpn evpn neighbor SPINES activate
-           - add bgp l2vpn evpn advertise-all-vni
+            - add bgp l2vpn evpn neighbor SPINES activate
+            - add bgp l2vpn evpn advertise-all-vni
         commit: true
+
+    - name: Configuring Layer2 port to VDX
+      nclu:
+        commands:
+            - add interface {{ item.l2 }} bridge trunk
+        commit: true
+      with_items:
+        - "{{ vdx_evpn }}"
+      when: ansible_hostname == 'leaf3'
+        
+    - name: Configuring Layer3 port to VDX
+      nclu:
+        commands:
+          - add vlan {{ item.vlnid }} ip address {{ item.ipaddrm }}
+          - add vlan {{ item.vlnid }} vrf {{ vrf_customer }}
+          - add vlan {{ item.vlnid }} mtu 9216
+          - add interface {{ item.l3 }} bridge access {{ item.vlnid }}
+          - add interface {{ item.l3 }} mtu 9216
+        commit: true
+      with_items:
+        - "{{ vdx_evpn }}"
+      when: ansible_hostname == 'leaf3'
+
+    - name: Adding VLAN OSPF Point-to-Point Network type.
+      nclu:
+        commands:
+           - add vlan {{ item.vlnid }} ospf network point-to-point
+        commit: true
+      with_items:
+        - "{{ vdx_evpn }}"
+      when: ansible_hostname == 'leaf3'
+    - name: Layer 3 connection to VDX
+      nclu:
+        commands:
+           - add ospf vrf {{ vrf_customer }}
+           - add ospf vrf {{ vrf_customer }} router-id {{ loopback_ip }}
+           - add ospf vrf {{ vrf_customer }} network {{ p2pnet }} area 0
+        commit: true
+      when: ansible_hostname == 'leaf3'
+    - name: Layer 3 BGP Redistribution from EVPN to VDX configuration
+      nclu:
+        commands:
+          - add bgp vrf {{ vrf_customer }} autonomous-system {{ asn }}
+          - add bgp vrf {{ vrf_customer }} router-id {{ loopback_ip }}
+          - add bgp vrf {{ vrf_customer }} ipv4 unicast redistribute connected
+          - add bgp vrf {{ vrf_customer }} ipv4 unicast redistribute ospf
+        commit: true
+      when: ansible_hostname == 'leaf3'
+
+    - name: Layer 3 OSPF Redistribution from VDX to EVPN configuration
+      nclu:
+        commands:
+          - add ospf vrf {{ vrf_customer }} redistribute bgp
+        commit: true
+      when: ansible_hostname == 'leaf3'
