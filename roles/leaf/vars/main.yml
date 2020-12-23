@@ -1,168 +1,64 @@
 ---
 # vars file for leafrole
-vrf_customer: "bbcore"
-l3vni_vlan: "4018"
-l3vni_name: "vnil3-bbcore"
-l3vxlan_id: "104018"
+vrf_customer:
+  - name: default-vrf
+    vrfid: "1004"
+    l3vni_vlan: "4019"
+    l3vni_name: "vnil3-default"
+    l3vni_id: "104019"
+  - name: bearinf-vrf
+    vrfid: "1006"
+    l3vni_vlan: "4018"
+    l3vni_name: "vnil3-bearinf"
+    l3vni_id: "104018"
 vlan:
   - id: 1
     name: default
+    vrf: default-inf
   - id: 2
-    name: VLAN0002
-  - id: 555
-    name: VLAN0555
-  - id: 666
-    name: UTAGGED_JUNK
-  - id: 700
-    name: VLAN0700
-  - id: 800
-    name: VDX_VROUTER_TR*
-  - id: 801
-    name: VDX_VROUTER_TR*
-  - id: 802
-    name: VDX_VROUTER_TR*
-  - id: 1001
-    name: rds-xcat
-  - id: 1002
-    name: rds-ipmi
-  - id: 1003
-    name: rds-peripheral
-  - id: 1004
-    name: rds-storage-gp*
-  - id: 1049
-    name: shared-xcat-im*
-  - id: 1050
-    name: shared-xcat
-  - id: 1051
-    name: pg-infrastruct*
-  - id: 1052
-    name: pg-peripheral
-  - id: 1053
-    name: pg-xcat-01
-  - id: 1054
-    name: pg-ipmi-01
-  - id: 1055
-    name: pg-ipoib-01
-  - id: 1056
-    name: pg-xcat-02
-  - id: 1057
-    name: pg-ipmi-02
-  - id: 1058
-    name: pg-ipoib-02
-  - id: 1059
-    name: pg-xcat-03
-  - id: 1060
-    name: pg-ipmi-03
-  - id: 1061
-    name: pg-ipoib-03
-  - id: 1500
-    name: VLAN1500
-  - id: 1501
-    name: VLAN1501
-  - id: 1502
-    name: rdnhscn172-2
-  - id: 1503
-    name: rdnhscn172-31-*
-  - id: 1504
-    name: rdnhscn172-31-*
-  - id: 1505
-    name: rdnhscn172-31-*
-  - id: 1700
-    name: VLAN1700
-  - id: 2001
-    name: RNET_1
-  - id: 2002
-    name: RNET_2
-  - id: 2003
-    name: RNET_3
-  - id: 2004
-    name: RNET_4
-  - id: 2005
-    name: RNET_5
-  - id: 2006
-    name: RNET_6
-  - id: 3001
-    name: climb-xcat
-  - id: 3002
-    name: climb-ipmi
-  - id: 3003
-    name: climb-peripher*
-  - id: 3004
-    name: climb-storage-*
-  - id: 3005
-    name: climb-bond
-  - id: 3006
-    name: climb-storage-*
-  - id: 3007
-    name: climb-vmnet
-  - id: 3008
-    name: climb-storage-*
-  - id: 3009
-    name: climb-storage-*
-  - id: 3010
-    name: climb-hscn-173
-  - id: 3012
-    name: rdn-vrouter-sy*
-  - id: 3014
-    name: clcephcovidpub
-  - id: 3015
-    name: clcephcovidcl
-  - id: 3100
-    name: rdn-peri
-  - id: 3102
-    name: rdn-ipmi
-  - id: 4001
-    name: bb2-xcat
-  - id: 4002
-    name: bb2-ipmi
-  - id: 4003
-    name: bb2-peri
-  - id: 4004
-    name: win-mgmt
-  - id: 4005
-    name: win-applicatio*
-  - id: 4007
-    name: COROSYNC-RRP
-  - id: 4011
-    name: xcat2
-  - id: 4012
-    name: ipmi2
-  - id: 4013
-    name: xcat3
-  - id: 4014
-    name: VLAN4014
-  - id: 4015
-    name: VLAN4015
+    name: VLAN2
+    vrf: default-inf
+  - id: 3
+    name: VLAN3
+    vrf: default-inf
+  - id: 6
+    name: VLAN6
+    vrf: default-inf
+  - id: 7
+    name: VLAN7
+    vrf: default-inf
+  - id: 8
+    name: VLAN8
+    vrf: default-inf
+  - id: 9
+    name: VLAN9
+    vrf: default-inf
 vxlan:
-  - name: VDX1VROUTER
-    id: 1801
-    vid: 801
-    gw: 192.168.81.1/24
-  - name: VDXVROUTER
-    id: 1802
-    vid: 802
-    gw: 192.168.82.1/24
-  - name: vni-rds-xcat
-    id: 11001
-    vid: 1001
-    gw: 192.168.101.1/24
-  - name: rdsstoragegp
-    id: 11004
-    vid: 1004
-    gw: 192.168.104.1/24
-  - name: shared-xcat
-    id: 11050
-    vid: 1050
-    gw: 192.168.105.1/24
-  - name: pg-xcat-01
-    id: 11053
-    vid: 1053
-    gw: 192.168.153.1/24
-  - name: pg-xcat-02
-    id: 11056
-    vid: 1056
-    gw: 192.168.156.1/24
-  - name: pg-xcat-03
-    id: 11059
-    vid: 1059
-    gw: 192.168.151.1/24
+  - name: vni-vlan1
+    id: 10001
+    vid: 1
+    gw: 192.168.1.1/24
+  - name: vni-vlan2
+    id: 10002
+    vid: 2
+    gw: 192.168.2.1/24
+  - name: vni-vlan3
+    id: 10003
+    vid: 3
+    gw: 192.168.3.1/24
+  - name: vni-vlan6
+    id: 10006
+    vid: 6
+    gw: 192.168.6.1/24
+  - name: vni-vlan7
+    id: 10007
+    vid: 7
+    gw: 192.168.7.1/24
+  - name: vni-vlan8
+    id: 10008
+    vid: 8
+    gw: 192.168.8.1/24
+  - name: vni-vlan9
+    id: 10009
+    vid: 9
+    gw: 192.168.9.1/24

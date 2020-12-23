@@ -1,0 +1,223 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*.intf
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+    # The primary network interface
+    address 150.1.4.4/32
+
+# The primary network interface
+auto eth0
+iface eth0 inet dhcp
+    vrf mgmt
+
+auto swp1
+iface swp1
+    alias UPLINK_TO_SPINE01
+    mtu 9216
+
+auto swp2
+iface swp2
+    alias UPLINK_TO_SPINE02
+    mtu 9216
+
+auto swp4
+iface swp4
+
+auto swp5
+iface swp5
+
+auto bearinf-vrf
+iface bearinf-vrf
+    vrf-table auto
+
+auto bridge
+iface bridge
+    bridge-ports peerlink vnil3-bearinf vnil3-default vni-vlan1 vni-vlan2 vni-vlan3 vni-vlan6 vni-vlan7 vni-vlan8 vni-vlan9
+    bridge-vids 1-3 6-9 4018-4019
+    bridge-vlan-aware yes
+
+auto default-inf
+iface default-inf
+    vrf-table auto
+
+auto default-vrf
+iface default-vrf
+    vrf-table auto
+
+auto mgmt
+iface mgmt
+    address 127.0.0.1/8
+    address ::1/128
+    vrf-table auto
+
+auto peerlink
+iface peerlink
+    bond-slaves swp4 swp5
+
+auto peerlink.4094
+iface peerlink.4094
+    clagd-backup-ip 169.254.10.1
+    clagd-peer-ip linklocal
+    clagd-priority 1000
+    clagd-sys-mac 44:38:39:BE:EF:A1
+
+auto vlan1
+iface vlan1
+    alias default
+    vlan-id 1
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan2
+iface vlan2
+    alias VLAN2
+    vlan-id 2
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan3
+iface vlan3
+    alias VLAN3
+    vlan-id 3
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan6
+iface vlan6
+    alias VLAN6
+    vlan-id 6
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan7
+iface vlan7
+    alias VLAN7
+    vlan-id 7
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan8
+iface vlan8
+    alias VLAN8
+    vlan-id 8
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan9
+iface vlan9
+    alias VLAN9
+    vlan-id 9
+    vlan-raw-device bridge
+    vrf default-inf
+
+auto vlan4018
+iface vlan4018
+    vlan-id 4018
+    vlan-raw-device bridge
+    vrf bearinf-vrf
+
+auto vlan4019
+iface vlan4019
+    vlan-id 4019
+    vlan-raw-device bridge
+    vrf default-vrf
+
+auto vni-vlan1
+iface vni-vlan1
+    bridge-access 1
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10001
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vni-vlan2
+iface vni-vlan2
+    bridge-access 2
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10002
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vni-vlan3
+iface vni-vlan3
+    bridge-access 3
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10003
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vni-vlan6
+iface vni-vlan6
+    bridge-access 6
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10006
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vni-vlan7
+iface vni-vlan7
+    bridge-access 7
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10007
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vni-vlan8
+iface vni-vlan8
+    bridge-access 8
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10008
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vni-vlan9
+iface vni-vlan9
+    bridge-access 9
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 10009
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vnil3-bearinf
+iface vnil3-bearinf
+    bridge-access 4018
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 104018
+    vxlan-local-tunnelip 150.1.4.4
+
+auto vnil3-default
+iface vnil3-default
+    bridge-access 4019
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    mtu 9216
+    vxlan-id 104019
+    vxlan-local-tunnelip 150.1.4.4
+

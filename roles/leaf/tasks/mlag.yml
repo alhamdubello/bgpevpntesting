@@ -1,0 +1,8 @@
+---
+- name: Configuring MLAG between switches
+  nclu:
+    commands:
+      - add clag peer sys-mac "{{ sysmac }}" interface "{{ item }}" primary backup-ip "{{ clag_backup_ip }}"
+    commit: true
+  with_items:
+    - "{{ clag_ports }}"

@@ -1,5 +1,18 @@
 ---
 # tasks file for common
+- name: Adding cumulus users sshkeys
+  authorized_key:
+    user: "{{ item }}"
+    key:  "{{ lookup('file', 'roles/common/vars/certs/id_belloau.pub')}}"
+  with_items:
+    - "{{ cumulususers }}"
+- name: Ports conf
+  become_user: true
+  template:
+    src=roles/common/vars/ports/{{ ansible_hostname }}.j2 dest=/etc/cumulus/ports.conf
+  notify: Restart Switchd
+- name: flush handlers
+  meta: flush_handlers
 - name: Configure SNMP Settings
   nclu:
     commands:

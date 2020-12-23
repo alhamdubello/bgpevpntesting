@@ -1,0 +1,61 @@
+---
+- hosts: all
+  become_user: yes
+  tasks:
+
+    - name: Backup ports.conf
+      fetch:
+        src: /etc/cumulus/ports.conf
+        dest: backup/{{ ansible_hostname }}/ports.conf
+        flat: yes
+
+    - name: Backup /etc/network/interfaces
+      fetch:
+        src: /etc/network/interfaces
+        dest: backup/{{ ansible_hostname }}/interfaces
+        flat: yes
+
+    - name: Backup /etc/frr/daemons
+      fetch:
+        src: /etc/frr/daemons
+        dest: backup/{{ ansible_hostname }}/daemons
+        flat: yes
+      ignore_errors: yes
+
+    - name: Checking for /etc/frr/frr.conf
+      become_user: yes
+      stat:
+        path: /etc/frr/frr.conf
+      register: frr_conf
+
+    - name: Backup /etc/frr/frr.conf
+      when: frr_conf.stat.exists == true
+      fetch:
+        src: /etc/frr/frr.conf
+        dest: backup/{{ ansible_hostname }}/frr.conf
+        flat: yes
+      ignore_errors: yes
+
+    - name: "Check if pam_radius config exists"
+      stat:
+        path: /etc/pam_radius_auth.conf
+      register: radius_conf
+
+    - name: "Check if snmpd config exists"
+      stat:
+        path: /etc/snmp/snmpd.conf
+      register: snmpd_conf
+
+    - name: "BACKUP RADIUS config"
+      when: radius_conf.stat.exists == true
+      fetch:
+        src: /etc/pam_radius_auth.conf
+        dest: backup/{{ansible_hostname}}/
+        flat: yes
+
+    - name: "BACKUP SNMPD config"
+      when: radius_conf.stat.exists == true
+      fetch:
+        src: /etc/pam_radius_auth.conf
+        dest: backup/{{ansible_hostname}}/
+        flat: yes

@@ -1,4 +1,8 @@
 ---
+    - name: Add MLAG
+      import_tasks: mlag.yml
+      tags: mlag
+
     - name: Adding system hostname and loopback ip.
       nclu:
         commands:
@@ -7,7 +11,7 @@
         atomic: true
     - name: Configure interfaces uplink to spine
       nclu:
-        commands: 
+        commands:
           - add interface swp1 alias UPLINK_TO_SPINE01
           - add interface swp2 alias UPLINK_TO_SPINE02
         commit: true
@@ -22,44 +26,56 @@
             - add interface swp1-2 ipv6 nd suppress-ra
             - add interface swp1-2 ipv6 nd ra-interval 5
         commit: true
+
     - name: Adding Layer 3 VNI VLAN
       nclu:
         commands:
-            - add vrf {{ vrf_customer }} vrf-table auto
-            - add vlan {{ l3vni_vlan }} vlan-id {{ l3vni_vlan }}
-            - add bridge bridge vids {{ l3vni_vlan }}      
+            - add vrf "{{ item.name }}" vrf-table "{{ item.vrfid }}"
+            - add vlan {{ item.l3vni_vlan }} vlan-id {{ item.l3vni_vlan }}
+            - add bridge bridge vids {{ item.l3vni_vlan }}
         commit: true
+      with_items:
+        - "{{  vrf_customer }}"
+      tags: vrf
 
     - name: Adding Layer 3 VNI VxlAN
       nclu:
         commands:
-            - add vxlan {{ l3vni_name }} vxlan id {{ l3vxlan_id }}
-            - add vxlan {{ l3vni_name }} vxlan local-tunnelip {{ loopback_ip }}
-            - add vxlan {{ l3vni_name }} bridge access {{ l3vni_vlan }}
-            - add vxlan {{ l3vni_name }} mtu 9216
+            - add vxlan {{ item.l3vni_name }} vxlan id {{ item.l3vni_id }}
+            - add vxlan {{ item.l3vni_name }} vxlan local-tunnelip {{ loopback_ip }}
+            - add vxlan {{ item.l3vni_name }} bridge access {{ item.l3vni_vlan }}
+            - add vxlan {{ item.l3vni_name }} mtu 9216
         commit: true
+      with_items:
+          - "{{  vrf_customer }}"
+      tags: l3vni
 
     - name: Adding Layer 3 VNI to VRF
       nclu:
         commands:
-            - add vlan {{ l3vni_vlan }} vrf {{ vrf_customer }}
-            - add vrf {{ vrf_customer }} vni {{ l3vxlan_id }}
+            - add vlan {{ item.l3vni_vlan }} vrf {{ item.name }}
+            - add vrf {{ item.name }} vni {{ item.l3vni_id }}
         commit: true
+      with_items:
+        - "{{  vrf_customer }}"
+      tags: vnivlan
     - name: Adding Host VLAN's
       nclu:
         commands:
              - add vlan {{ item.id }} alias {{ item.name }}
              - add bridge bridge vids {{ item.id }}
+             - add vlan {{ item.id }} vrf {{ item.vrf }}
         commit: true
       with_items:
         - "{{ vlan }}"
+      tags: hostvlan
     - name: Adding Host VNI names id and vrf
       nclu:
         commands:
            - add vxlan {{ item.name }} vxlan id {{ item.id }}
            - add vxlan {{ item.name }} vxlan local-tunnelip {{ loopback_ip }}
            - add vxlan {{ item.name }} bridge access {{ item.vid }}
-           - add vlan {{ item.vid }} vrf {{ vrf_customer }}  
+           - add vlan {{ item.vid }} vrf {{ vrf_customer }}
         commit: true
       with_items:
         - "{{ vxlan }}"
@@ -92,6 +108,7 @@
              add bgp maximum-paths 64
              add bgp neighbor SPINES peer-group
              add bgp neighbor SPINES remote-as external
+             add bgp neigbbor peerlink.4094 interface remote-as internal
              add bgp neighbor SPINES capability extended-nexthop
              {% for nei in neighbors %}
              add bgp neighbor {{ nei }} interface peer-group SPINES
@@ -112,7 +129,7 @@
       with_items:
         - "{{ vdx_evpn }}"
       when: ansible_hostname == 'leaf3'
-        
+
     - name: Configuring Layer3 port to VDX
       nclu:
         commands:

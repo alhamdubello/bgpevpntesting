@@ -9,18 +9,17 @@
 - name: configure interfaces LINK_TO_LEAF_SWITCHES
   nclu:
     commands:
-       - add interface swp1-6 alias LINK_TO_LEAF_SWITCHES
-       - add interface swp1-6
+       - add interface swp1-2 alias LINK_TO_LEAF_SWITCHES
     commit: true
 - name: Set MTU for interfaces LINK_TO_LEAF_SWITCHES
   nclu:
     commands:
-       - add interface swp1-6 mtu 9216
+       - add interface swp1-2 mtu 9216
 - name: Set IPv6 configuration on LINK_TO_LEAF_SWITCHES
   nclu:
     commands:
-       - add interface swp1-6 ipv6 nd suppress-ra
-       - add interface swp1-6 ipv6 nd ra-interval 5
+       - add interface swp1-2 ipv6 nd suppress-ra
+       - add interface swp1-2 ipv6 nd ra-interval 5
     commit: true
 
 - name: BGP Basic

@@ -1,0 +1,13 @@
+---
+# vars file for leaf02
+    hostname_sw: leaf02
+    loopback_ip: 150.1.4.4
+    asn: 65101
+    neighbors:
+      - swp1
+      - swp2
+    sysmac: 44:38:39:BE:EF:A1
+    clag_ports:
+      - swp4
+      - swp5
+    clag_backup_ip: 169.254.10.1

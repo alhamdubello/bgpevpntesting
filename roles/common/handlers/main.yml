@@ -1,2 +1,8 @@
 ---
 # handlers file for common
+- name: Restart Switchd
+  service:
+    name: switchd
+    state: restarted
+    enabled: yes
+  become: yes

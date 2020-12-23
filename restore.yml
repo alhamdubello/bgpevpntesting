@@ -1,0 +1,48 @@
+---
+- hosts: all
+  become_user: yes
+
+  handlers:
+    - name: Restarting switchd
+      service:
+        name: switchd
+        state: restarted
+      listen: switchd
+
+    - name: restart frr
+      service:
+        name: frr
+        state: restart
+      listen: frr
+
+    - name: Reload networking
+      command: /sbin/ifreload -a
+      listen: ifreload
+  tasks:
+    - name: Restoring /etc/cumulus/ports.conf
+      copy:
+        src: backup/{{ ansible_hostname }}/ports.conf
+        dest: /etc/cumulus/
+      notify: switchd
+
+    - name: Restoring Interfaces configuration
+      copy:
+        src: backup/{{ ansible_hostname }}/interfaces
+        dest: /etc/network/
+      notify:
+        - switchd
+        - ifreload
+
+    - name: Restore FRR daemons
+      copy:
+        src: backup/{{ ansible_hostname }}/daemons
+        dest: /etc/frr/daemons
+      ignore_errors: yes
+      notify: frr
+
+    - name: Restore FRR configurations
+      copy:
+        src: backup/{{ ansible_hostname }}/frr.conf
+        dest: /etc/frr/frr.conf
+      ignore_errors: yes
+      notify: frr

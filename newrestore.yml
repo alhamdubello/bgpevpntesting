@@ -1,0 +1,22 @@
+---
+- hosts: all
+  tasks:
+    - name: Copy Backups from bear-mn01
+      fetch:
+        src: backup/{{ ansible_hostname }}/config/
+
+    - name: Performing Restore using config-backup
+      become: true
+      shell: config-restore -b "{{ backup/leaf01/config/}}"config_backup-2019-04-23-21.30.47_leaf01
+      register: rstcfg
+
+
+    - debug:
+        msg: "Hello world {{ bkcfg.stdout.split(':')[2].split(' ')[3] }}"
+
+
+    - name: Fetch files to secure backup
+      become: true
+      fetch:
+        src: "{{ bkcfg.stdout.split(':')[2].split(' ')[3] }}"
+        dest: backup/{{ ansible_hostname }}/config/

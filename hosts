@@ -4,15 +4,9 @@ ansible_ssh_password=password
 become=yes
 become_user=cumulus
 [spine]
-spine1
-spine2
+spine01 ansible_port=2201 ansible_host=127.0.0.1
 
 [leaf]
-leaf1
-leaf2
-leaf3
-leaf4
+leaf01 ansible_port=2222 ansible_host=127.0.0.1
+leaf02 ansible_port=2200 ansible_host=127.0.0.1
 
-[exit]
-exit1
-exit2
